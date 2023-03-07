@@ -11250,6 +11250,7 @@ p {
   visibility: hidden;
   transition: 0.5s;
   -webkit-transition: 0.5s;
+  
 }
 
 .portfolio .portfolio-container .portfolio-item .content-holder .title {
@@ -11682,4 +11683,93 @@ pre .code {
   background: #5c80f8;
   display: block;
   margin-top: 10px;
+}
+
+.links-container {
+  margin: auto;
+  display: flex;
+  gap: 100px;
+  justify-content: center;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.link-item {
+  text-align: center;
+  margin: 0 10px;
+}
+
+.links-scroll-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: none;
+  outline: none;
+  font-size: 24px;
+  font-weight: bold;
+  color: black;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.links-scroll-button:hover {
+  opacity: 1;
+}
+
+#link-scroll-left {
+  left: 10px;
+}
+
+#link-scroll-right {
+  right: 10px;
+}
+
+.iot-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+
+.tile {
+  display: inline-block;
+  width: 200px;
+  height: auto;
+  background-color: #f0f0f0;
+  margin: 10px;
+  padding: 10px;
+  box-shadow: 0px 0px 10px #ddd;
+  border-radius: 10px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+.device-name {
+  border: 1px solid;
+  border-radius: 5px;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 10px;
+  color: #000;
+  padding: 2px;
+}
+
+.key {
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 10px;
+  color: #888;
+}
+
+.value {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 5px;
+  color: #333;
 }

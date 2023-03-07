@@ -12,139 +12,117 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-// smooth scroll
-$(document).ready(function(){
-    $(".navbar .nav-link").on('click', function(event) {
-
-        if (this.hash !== "") {
-
-            event.preventDefault();
-
-            var hash = this.hash;
-
-            $('html, body').animate({
-                scrollTop: $(hash).offset().top
-            }, 700, function(){
-                window.location.hash = hash;
-            });
-        } 
-    });
-});
-
 // protfolio filters
-$(window).on("load", function() {
-    var t = $(".portfolio-container");
-    t.isotope({
-        filter: ".new",
-        animationOptions: {
+$(window).on("load", function () {
+  var t = $(".portfolio-container");
+  t.isotope({
+    filter: ".new",
+    animationOptions: {
+      duration: 750,
+      easing: "linear",
+      queue: !1,
+    },
+  }),
+    $(".filters a").click(function () {
+      $(".filters .active").removeClass("active"), $(this).addClass("active");
+      var i = $(this).attr("data-filter");
+      return (
+        t.isotope({
+          filter: i,
+          animationOptions: {
             duration: 750,
             easing: "linear",
-            queue: !1
-        }
-    }), $(".filters a").click(function() {
-        $(".filters .active").removeClass("active"), $(this).addClass("active");
-        var i = $(this).attr("data-filter");
-        return t.isotope({
-            filter: i,
-            animationOptions: {
-                duration: 750,
-                easing: "linear",
-                queue: !1
-            }
-        }), !1
+            queue: !1,
+          },
+        }),
+        !1
+      );
     });
 });
 
+const jsonData = [{"_id": "64006e4fde9a22ee13ffb5af", "chipID": "7892484", "data": {"temperature": 29.79999924}, "name": "Indoor Temperature Sensor"}, {"_id": "6401e54e109ed9895a4527f9", "chipID": "13099037", "data": {"temperature": 30.89999962, "humidity": 49, "moisture": 67}, "timestamp": 1678021594.815448, "name": "Plant Monitor"}];
 
-// google maps
-function initMap() {
-// Styles a map in night mode.
-    var map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: 40.674, lng: -73.945},
-        zoom: 12,
-        scrollwheel:  false,
-        navigationControl: false,
-        mapTypeControl: false,
-        scaleControl: false,
-      styles: [
-        {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
-        {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
-        {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
-        {
-          featureType: 'administrative.locality',
-          elementType: 'labels.text.fill',
-          stylers: [{color: '#d59563'}]
-        },
-        {
-          featureType: 'poi',
-          elementType: 'labels.text.fill',
-          stylers: [{color: '#d59563'}]
-        },
-        {
-          featureType: 'poi.park',
-          elementType: 'geometry',
-          stylers: [{color: '#263c3f'}]
-        },
-        {
-          featureType: 'poi.park',
-          elementType: 'labels.text.fill',
-          stylers: [{color: '#6b9a76'}]
-        },
-        {
-          featureType: 'road',
-          elementType: 'geometry',
-          stylers: [{color: '#38414e'}]
-        },
-        {
-          featureType: 'road',
-          elementType: 'geometry.stroke',
-          stylers: [{color: '#212a37'}]
-        },
-        {
-          featureType: 'road',
-          elementType: 'labels.text.fill',
-          stylers: [{color: '#9ca5b3'}]
-        },
-        {
-          featureType: 'road.highway',
-          elementType: 'geometry',
-          stylers: [{color: '#746855'}]
-        },
-        {
-          featureType: 'road.highway',
-          elementType: 'geometry.stroke',
-          stylers: [{color: '#1f2835'}]
-        },
-        {
-          featureType: 'road.highway',
-          elementType: 'labels.text.fill',
-          stylers: [{color: '#f3d19c'}]
-        },
-        {
-          featureType: 'transit',
-          elementType: 'geometry',
-          stylers: [{color: '#2f3948'}]
-        },
-        {
-          featureType: 'transit.station',
-          elementType: 'labels.text.fill',
-          stylers: [{color: '#d59563'}]
-        },
-        {
-          featureType: 'water',
-          elementType: 'geometry',
-          stylers: [{color: '#17263c'}]
-        },
-        {
-          featureType: 'water',
-          elementType: 'labels.text.fill',
-          stylers: [{color: '#515c6d'}]
-        },
-        {
-          featureType: 'water',
-          elementType: 'labels.text.stroke',
-          stylers: [{color: '#17263c'}]
-        }
-      ]
-    });
+
+// Extract data from JSON and create tiles dynamically
+
+const tilesContainer = document.getElementById("iot-container");
+
+fetch('/device/data/collection1')
+  .then(response => response.json()) // parse the JSON data
+  .then(data => {
+data.forEach((device) => {
+  const tile = document.createElement("div");
+  tile.classList.add("tile");
+  const chipId = document.createElement("div");
+  const chipIdValue = document.createElement("div");
+  chipIdValue.classList.add("device-name");
+  chipIdValue.textContent = device.name;
+  tile.appendChild(chipId);
+  tile.appendChild(chipIdValue);
+  const dataKeys = Object.keys(device.data);
+  dataKeys.forEach((key) => {
+    const dataKey = document.createElement("div");
+    dataKey.classList.add("key");
+    dataKey.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+    const dataValue = document.createElement("div");
+    dataValue.classList.add("value");
+    dataValue.textContent = device.data[key];
+    tile.appendChild(dataKey);
+    tile.appendChild(dataValue);
+  });
+  
+
+  tilesContainer.appendChild(tile);
+
+  const tiles = document.querySelectorAll(".tile");
+
+// get the maximum height of all the tiles
+const maxHeight = Math.max(
+  ...Array.from(tiles).map((tile) => tile.offsetHeight)
+);
+
+// set the height of all the tiles to be the same as the maximum height
+tiles.forEach((tile) => {
+  tile.style.height = `${maxHeight}px`;
+});
+});
+});
+
+
+const messageForm = document.getElementById('MessageForm');
+messageForm.addEventListener("submit", async (e) => {
+
+  e.preventDefault();
+  let form = e.currentTarget;
+  let url = form.action;
+
+  try {
+    let formData = new FormData(form);
+    let responseData = await postFormFieldsAsJson({ url, formData });
+    let { serverDataResponse } = responseData;
+    console.log(serverDataResponse);
+    alert("Message Sent!")
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+async function postFormFieldsAsJson({ url, formData }) {
+  let formDataObject = Object.fromEntries(formData.entries());
+  let formDataJsonString = JSON.stringify(formDataObject);
+  let fetchOptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: formDataJsonString,
+  };
+  let res = await fetch(url, fetchOptions);
+
+  if (!res.ok) {
+    let error = await res.text();
+    throw new Error(error);
+  }
+  return res.json();
 }

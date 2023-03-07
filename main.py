@@ -1,0 +1,71 @@
+import json
+from shutil import ExecError
+from flask import Flask, redirect, request, send_file
+import requests
+
+from db.deviceDb import get_all_collections, list_all_documents, update_or_insert_doc
+
+app = Flask(__name__, static_folder='assets')
+
+@app.route('/')
+def index():
+    return send_file('index.html')
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_file('favicon.ico')
+
+@app.route('/device/data/<collection>', methods=['POST','GET'])
+def data(collection):
+    if request.method=="POST":
+        id=request.headers.get('x-chip-id')
+        try:
+            sensors=request.json['sensors']
+        except Exception:
+            sensors=None
+        try:
+            actuators=request.json['actuators']
+        except Exception:
+            actuators=None
+        update_or_insert_doc(collection,id, sensors=sensors, actuators=actuators)
+        return 'Success!', 200
+    else:
+        id=request.headers.get('x-chip-id')
+        if id:
+            return list_all_documents(collection, id=id)
+        else:
+            return list_all_documents(collection, id=None)
+
+@app.route('/device/data/', methods=['GET'])
+def getData():
+    collections=get_all_collections()
+    return collections
+
+
+@app.route('/downloadResume' , methods=['GET'])
+def getResume():
+    return redirect('./assets/pdf/Resume-AmmarShahid.pdf')
+
+@app.route('/sendMessage', methods=['POST','GET'])
+def sendMessage():
+    if request.method=='POST':
+        data= request.json
+        print(data)
+        message= "Name: "+data['name']+"\nEmail: "+data['email']+" \nMessage: "+data["message"]
+        
+        # set up the webhook URL and message payload
+        webhook_url = "https://discordapp.com/api/webhooks/1082215154810368020/L8MZ8Gafqyk9pmjIGO1v8IQIeQ6jjiD7keup-cPT3RQk_EcU5q3lck3-tXUm61yoTswN"
+        payload = {
+            "content": message
+        }
+        headers = {
+            "Content-Type": "application/json"
+        }
+        
+        requests.post(webhook_url, data=json.dumps(payload), headers=headers)
+
+        return json.dumps({'data':"success"})
+    else:
+        return "get sucess", 200 
+if __name__ == '__main__':
+    app.run(host="0.0.0.0",port=5000) # Change the port to 5000
