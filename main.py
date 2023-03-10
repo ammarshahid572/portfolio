@@ -46,6 +46,14 @@ def getData():
 def getResume():
     return redirect('./assets/pdf/Resume-AmmarShahid.pdf')
 
+
+@app.route('/updateLogs', methods=['POST'])
+def updateFile():
+    data=request.json
+    with open('gpsLogs.txt', 'a') as f:
+        f.write('\n')
+        f.write(json.dumps(data))
+    return 'success',200
 @app.route('/sendMessage', methods=['POST','GET'])
 def sendMessage():
     if request.method=='POST':
