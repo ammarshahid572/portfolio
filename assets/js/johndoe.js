@@ -40,9 +40,6 @@ $(window).on("load", function () {
     });
 });
 
-const jsonData = [{"_id": "64006e4fde9a22ee13ffb5af", "chipID": "7892484", "data": {"temperature": 29.79999924}, "name": "Indoor Temperature Sensor"}, {"_id": "6401e54e109ed9895a4527f9", "chipID": "13099037", "data": {"temperature": 30.89999962, "humidity": 49, "moisture": 67}, "timestamp": 1678021594.815448, "name": "Plant Monitor"}];
-
-
 // Extract data from JSON and create tiles dynamically
 
 const tilesContainer = document.getElementById("iot-container");
@@ -51,6 +48,7 @@ fetch('/device/data/collection1')
   .then(response => response.json()) // parse the JSON data
   .then(data => {
 data.forEach((device) => {
+  
   const tile = document.createElement("div");
   tile.classList.add("tile");
   const chipId = document.createElement("div");
@@ -59,14 +57,16 @@ data.forEach((device) => {
   chipIdValue.textContent = device.name;
   tile.appendChild(chipId);
   tile.appendChild(chipIdValue);
-  const dataKeys = Object.keys(device.data);
+  const dataKeys = Object.keys(device.sensors);
   dataKeys.forEach((key) => {
     const dataKey = document.createElement("div");
     dataKey.classList.add("key");
     dataKey.textContent = key.charAt(0).toUpperCase() + key.slice(1);
     const dataValue = document.createElement("div");
     dataValue.classList.add("value");
-    dataValue.textContent = device.data[key];
+
+    dataValue.textContent = device.sensors[key];
+    if  (device.units[key]) dataValue.textContent = dataValue.textContent +  device.units[key];
     tile.appendChild(dataKey);
     tile.appendChild(dataValue);
   });

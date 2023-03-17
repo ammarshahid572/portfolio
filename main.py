@@ -1,9 +1,9 @@
 import json
-from shutil import ExecError
+from werkzeug.utils import secure_filename
 from flask import Flask, redirect, request, send_file
 import requests
 
-from db.deviceDb import get_all_collections, list_all_documents, update_or_insert_doc
+from db.deviceDb import get_all_collections, getOta, insertOtaBins, list_all_documents, update_or_insert_doc
 
 app = Flask(__name__, static_folder='assets')
 
@@ -11,9 +11,47 @@ app = Flask(__name__, static_folder='assets')
 def index():
     return send_file('index.html')
 
+@app.route('/display')
+def displayControl():
+    return send_file('display.html')
+
+@app.route('/map-points')
+def maps():
+    return send_file('map.html')
+
 @app.route('/favicon.ico')
 def favicon():
     return send_file('favicon.ico')
+
+@app.route('/otaupload', methods=['GET', 'POST'])
+def uploadOta():
+    if request.method=='GET':
+        return send_file('otaupload.html')
+    else:
+        file = request.files['file']
+        if '.bin' in file.filename:
+            vName= request.form['vName']
+            vNumber= request.form['vNumber']
+            vClass= request.form['vClass']
+            print(vClass,vName)
+            filename = f'{vClass}_{vName}.bin'
+            insertOtaBins(vClass,vName,vNumber, filename)
+            file.save('./bins/'+filename)
+            return "success",200
+        else:
+            return "invalid file type only .bin accepted", 400
+
+@app.route('/getOta/<vClass>', methods=['GET'])
+def getOtaInfo(vClass):
+    if vClass!='all':
+        return getOta(vClass=vClass)
+    else:
+        return getOta(vClass=None)
+
+@app.route('/bins/<filename>', methods=['GET'])
+def downloadBin(filename):
+    print(filename)
+    return send_file(f'bins/{filename}')
 
 @app.route('/device/data/<collection>', methods=['POST','GET'])
 def data(collection):
